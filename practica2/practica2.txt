@@ -1,0 +1,25 @@
+Autor: Anxo Abuelo Veira
+
+En esta práctica se implementará un sencillo parser XML a través de Bison y FLEX.
+
+Para el desarrollo de esta práctica comenzaremos implementando nuestro fichero practica2.l.
+El primer paso es declarar tanto las librerías como las posibles variables que vamos a necesitar,
+después de esto pasaremos a la sección de declaraciones en la que vamos a distinguir las diferentes
+cosas que queremos detectar como por ejemplo los digitos, letras, etc. Así mismo, declararemos también
+con el operador "%option" la variable yylinneno que usaremos posteriormente para detectar en que línea ha 
+sucedido un error si la sintaxis es incorrecta. Acto seguido, declararemos las distintas reglas que vamos 
+a necesitar en nuestro parser, las reglas que yo he declarado son para detectar distintas posibilidades de
+texto como los comentarios, las declaracciones y las etiquetas con sus respectivas aperturas y cierres. 
+Aquí cabe destacar que para las etiquetas no distingo entre apertura y cierre en una misma etiqueta es decir("<" ">") si no que
+distingo solo entre etiquetas de apertura y etiquetas de cierre es decir("<nombre> </nombre>").
+Una vez tenemos esto pasaremos a implementar el fichero practica2.y en el que declararemos las reglas de nuestra gramática.
+Comenzaremos declarando las librerías y variables que vamos a usar. Después de esto declararemos el struct union para 
+poder indicar que nuestros tokens son de tipo "char*" así como indicar a bison que el campo val será de tipo "char*" también para 
+poder acceder a través de los símbolos de "$" a los valores de nuestros tokens. Continuamos declarando los diferentes tokens(indicando su tipo) 
+que tomarán los nombres de las variables retornadas en el archivo practica2.l cuando una regla se cumple. Acto seguido, 
+pasaremos a definir las reglas de nuestra gramática. Aquí cabe destacar la manera de obtener el error en caso de que una etiqueta de 
+cierre no coincida con la de apertura. Para ello, compararemos en la regla entry tanto si ETIQ_OPEN como ETIQ_CLOSE son iguales, en caso
+contrario, llamaremos a la función yyerror e imprimiremos el error, lo que se esperaba así como la línea en la que ocurrió el error.
+Por otro lado, en caso de que salte un error como por ejemplo que no se cierre una etiqueta con ">" o que no se abra "<" imprimiremos 
+el mensaje de error indicando la línea y tipo de error "syntax error". En caso de que todo el archivo sea correcto, es decir todo el 
+"texto" de nuestro archivo cumpla las reglas de nuestra gramática se ejcutará la función yywrap que imprimirá el mensaje "Sintaxis XML correcta."  
