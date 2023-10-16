@@ -1,0 +1,9 @@
+Diseño e implementación mediante FLEX de un analizador estadístico de
+textos, de forma que dado un fichero de texto de entrada muestre el número total de
+caracteres que lo componen (sin contar los espacios en blanco ni los tabuladores), el
+número total de palabras (secuencias de caracteres que no posean ni espacios ni
+tabuladores), el número de palabras en mayúscula (todos los caracteres), el número de
+palabras en minúscula (todos los caracteres), el número de palabras numéricas (todos los
+caracteres son dígitos) y el número de frases (secuencias de palabras finalizadas por “.”). Es
+preciso que el analizador reconozca cualquier tipo de palabra, no es necesario que éstas
+tengan sentido, por ejemplo, la cadena a2ki?-)7 sería una palabra válida.

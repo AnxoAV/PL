@@ -1,0 +1,28 @@
+Autor: Anxo Abuelo Veira
+
+En esta práctica se desarrollará un programa para contar el número de caracteres,           
+número de palabras, número de palabras formadas solo por mayúsculas*, número de                         
+palabras formadas solo por minúsculas*, número de palabras formadas solo por dígitos
+y el número de frases.
+
+*Aclaración: Las palabras minúsculas y mayúsculas seguidas de: "." "," ":" etc.
+             son consideradas palabras mayúsculas o minúsculas respectivamente.
+             Es decir, la palabra "hola," será considerada una palabra formada
+             solo por minúsculas. Así mismo, las minúsculas con tildes en alguna
+             de sus letras también serán consideradas minúsculas.
+
+Para su desarrollo comenzamos definiendo las variables que vamos a usar para los 
+contadores en la sección de declaraciones, necesitaremos una para cada cosa que querramos contar.
+También en esta misma sección definiremos las declaraciones de que va a ser cada cosa para nosotros
+por ejemplo, un digito se reconocerá como digit[0-9].
+Acto seguido comenzaremos a definir las reglas que nos servirán para decidir en que momento ampliar
+cada contador y ver a que parte pertenece cada secuencia de caracteres. Por ejemplo, cuando
+llega una cadena de caracteres formada por minśuculas se activará la parte de la regla "{minus}" de la regla 
+"{minus}|{minus}{especial}", lo que hará que nuestro contador de palabras minúsculas se aumente en uno. 
+Así mismo, si detecta la concatenación de una minúscula con un caracter que he definido como "especial"(. , etc.) 
+activará la parte "{minus}{especial}" de la regla mencionada anteriormente por lo que el contador de palabras
+en minúscula aumentará en uno también. 
+Esto mismo se realizará con cada uno de los casos que queremos detectar y aumentando en 1 el contador asociado.
+
+Finalmente en la sección de código, introduciremos un main en el que se llamará al analizador léxico y se imprimirán
+los diferentes valores obtenidos de cada contador.

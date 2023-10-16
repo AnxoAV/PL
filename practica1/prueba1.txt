@@ -1,0 +1,1 @@
+FLEX es una herramienta para generar escáneres, es decir, programas que reconocen patrones léxicos en un texto.
