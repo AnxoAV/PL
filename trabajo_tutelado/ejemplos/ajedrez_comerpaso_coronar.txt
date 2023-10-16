@@ -1,0 +1,7 @@
+Blancas Negras
+b4 g5
+b5 a5
+bxa6 h6
+axb7 h5
+bxAc8=T
+1-0

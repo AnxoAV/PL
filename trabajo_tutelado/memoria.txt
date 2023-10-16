@@ -1,0 +1,86 @@
+Miembros del grupo:
+	Anxo Abuelo
+	Marta Martín de Argenta Hernández
+
+Objetivos de la práctica:
+	* Implementar un ajedrez, así como un analizador léxico y sintáctico de las planillas del mismo.
+	* Los analizadores buscarán la validez de cada una de las jugadas, tanto de forma individual, como en un conjunto.
+Ficheros que componen la práctica:
+	* opciones.c
+	* ajedrez.l
+	* ajedrez.y
+	* Makefile
+	* actualizar_imprimir.h casilla_inicial.h comprobaciones.h finpartida.h jaque_mate.h tablas.h
+	* ajedrez_comperpaso_coronar.txt ajedrez_final_equivocado.txt ajedrez_jaquemate_equivocado.txt ajedrez_movertodas.txt ajedrez_noesmate.txt ajedrez_pastor.txt ajedrez_tablas_3cons.txt ajedrez_enroque.txt
+
+Instrucciones de compliación/ejecución:
+	* Se ejecutará el archivo opciones.c, donde se encuentra el menú con opción (también se podría ejecutar directamente con "make 1" o "make 2").
+	* En este menú tendremos que introducir (1) si queremos que se quiera buscar una plantilla y (2) si queremos jugar a tiempo real.
+	* En el makefile tenemos el ejemplo que queramos usar, se puede cambiar.
+	* En el archivo tablero.txt tenemos el tablero inicial. Esto es útil por si se desea evaluar alguna posición concreta, poder modificarlo. Ahora mismo se encuentra con la situación normal de iniciar una partida de ajedrez.
+Estructura de las planillas:
+Las planillas poseen la siguiente estructura:
+	* Están encabezadas por "Blancas Negras" (separadas por espacios o tabuladores)
+	* En cada fila se encuentra una jugada de blancas seguida de otra de negras (salvo que ganen blancas, cuya última jugada sería solo una jugada blanca)
+	* La última fila es el resultado de la partida(1-0, 0-1 o 1/2-1/2). En caso de ser 1-0 o 0-1 no se comprueba jaque mate porque el otro jugador pudo rendirse, sin embargo, si se hace para tablas.
+	* La estructura para una jugada es Pln (donde P es la pieza, l y n son las coordenadas de la casilla, letra y número respectivamente)
+	* En caso de que dos piezas iguales puedan ir a la misma casilla, se indicará la casilla de la que propiene (indicando lo que tiene distinto de la otra, ej. Ccd4)
+	* Si una pieza captura a otra pieza se marca con una x entre la pieza y la casilla (ej. CxDf3)
+	* El enroque corto se reconoce como 0-0. El enroque largo como 0-0-0
+	* El jaque se indica como +. El jaque mate como ++.
+	* La coronación de un peón se indica como movimiento=pieza (ej. e8=D)
+	* Comer al paso se indica como un movimiento de peón normal (ej. exd6)
+	* Si un jugador ofrece tablas se indicará de la siguiente forma: (=)
+
+Descripción del analizador léxico y sintáctico:
+
+	* ajedrez.l
+	Se distinguirán:
+		- delim -> Espacio o tabulador, empleados para separar jugadas de blancas y negras. No se pasa como token al .y
+		- linea -> Número indefinido de saltos de linea para separar las jugadas. No se pasará como token al .y
+		- coronar -> ="pieza", identifica por qué pieza se quiere cambiar el peón que corona. Se pasa como token CORONACION.
+		- jugada -> Movimiento a realizar por blancas o negras, siguiendo las reglas de la federación. Se pasa como token JUGADA.
+		- enroque_largo -> Cuando un jugador se enroca largo lo indica con 0-0-0. Se pasa como token ENROQUE.
+		- enroque -> Cuando un jugador se enroca corto lo indica con 0-0. Se pasa como token ENROQUE.
+		- resultado_victoria -> Se considerarán victorias 1-0 o 0-1. Se pasa como token VICTORIA.
+		- resultado_empate -> Se considerará empate 1/2-1/2. Se pasa como token EMPATE.
+		- jaque -> Se considerará jaque cuando aparezca un +. Se pasa como token JAQUE.
+		- jaque_mate -> Se considerará jaque mate cuando aparezcan dos + ("++"). Se pasa como token JAQUE_MATE.
+		- ofrecer_tablas -> Cuando aparezca "(=)", se tomará como que el jugador ha ofrecido tablas (aunque el otro no necesariamente las haya aceptado). Se pasa como token TABLAS.
+		- cabecera -> La cabecera identifica ("Blancas Negras"). Se pasará con el token CABECERA.
+		- capturar_pieza -> Capturar pieza se indica como x"pieza""casilla", es decir, una x seguido por el tipo de pieza a capturar (nada si es un peón) y la casilla donde se captura. Se pasa como token COMER.
+		- cualquier otro caso no hará nada.
+
+	* ajedrez.y
+	Se comprueba que la primera linea sea una cabecera (la estructura de la planilla debe ser cabecera seguida por la partida). Si todo el árbol anterior ha sido correcto, pasaremos a comprobar que los resultados sean correctos, es decir, que si se especifican tablas sean tablas o que si ha habido un jaque mate se conceda la victoria al jugador.
+	Las partidas se componen por movimeintos de cada uno de los jugadores o solo del blanco en caso de que sea la última jugada. En ese segundo caso le seguiría el resultado, en el otro caso el resultado iría separado (con el fin de que en caso de que jugador de blancas no se presente se podría conceder la partida a negras).
+	Se comprueba si ha ocurrido las tablas para el caso de que una misma situación se haya dado 3 veces consecutivas o si debe actualizarse la última jugada.
+	En los casos de tratarse de resultados, si el resultado es incorrecto se corrige.
+	A la hora de definir un movimiento, este puede llevar o no la anotación de que se han ofrecido tablas. Si es el caso, se pondrá a true la variable para, en caso de ser la última jugada, comprobar que han sido tablas.
+	Los movimientos de blancos y negras son equivalentes:
+		- Pueden contener jaque, mate, coronación o ser la jugada sola. Se comprobará en todos los casos si es jaque o mate. Si coronamos también se actualizará la pieza a la que se había pedido.
+		- Definimos los movimientos como una jugada, comer una pieza o enroque. Si es una jugada y el rey no está ahogado, se comprobará su validez. Lo mismo se hará en el caso de comer,pero con la reestricción de que dicha pieza debe existir. En el caso del enroque se informará al usuario de que ha ocurrido y, posteriormente, se actualizará la partida.
+	Cuando se analiza el resultado, se almacenará el ganador (o empate), para una vez analicemos el árbol poder corroborarlo.
+
+	Para todos estos análisis se llevan a cabo funciones que hemos decidido dividir con librerías, ya que modularizando nos parecía más sencillo de comprender. Las librerías son las siguientes:
+		* actualizar_imprimir.h -> Una vez verificado que el movimiento es correcto, se procede a actualizar el tablero e imprimir el mismo. Esto se realiza con las funciones de la librería.
+		* casilla_inicial.h -> Las funciones de esta librería funcionan en conjunto para encontrar las posibles casillas iniciales, es decir, donde están las piezas con requisitos para moverse.
+		* comprobaciones.h -> Las funciones de esta librería funcionan para comprobar que el movimiento sea correcto y después poder actualizarlo.
+		* finpartida.h -> Las funciones de esta librería comprueban el correcto resultado.
+		* jaque_mate.h -> Las funciones de esta partida comprueban que una jugada sea o no jaque mate.
+		* tablas.h -> Las funciones de esta partida comprueban tablas como el ahogado.
+
+Tratamiento de errores:
+Se considerarán errores los siguientes casos:
+	* Jugada mal escrita (no seguir la estructura marcada)
+	* Jugada ilegal (movimiento a una casilla a la que no se puede mover una pieza)
+	* Jugada ilegal (movimiento a una casilla en la que el jugador tiene otra pieza)
+	* Jugada ilegal (movimiento de una pieza mientras estás en jaque que no te libra del jaque)
+	* Jugada ilegal (enrocarse con piezas entre el rey y la torre o con una de esas casillas atacada)
+	* Jugada ilegal (comerse el rey)
+	* Jugada ilegal (mover una pieza que está clavada)
+	* Marcar jaque o jaque mate cuando no lo es
+	* No iniciar con la cabecera o no finalizar con el resultado de la partida
+	* El resultado de la partida no se corresponde con el final de la misma
+
+Anotación: Aunque se juegue a tiempo real, se deben introducir jugadas de blanca y negra en la misma linea.
